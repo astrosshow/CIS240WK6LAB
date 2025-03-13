@@ -41,12 +41,15 @@ skip_2:
 
     lw t6, 12(t1)             # Load array[3] into t6
     blt t2, t6, new_max_3     # Branch to new_max_3 if max < array[3]
-    j skip_3
+    j done
 
 new_max_3:
     sw t6, 0(t0)              # Store new max
 
-skip_3:
-    add a1, t0, zero          # Copy the address of max into t1
+done:                       
+    lw a1, 0(t0)              # Load the address of max into a1
     li a0, 1                  # Load the system call number for print_int
-    ecall                     # Make the system call
+    ecall                     # Make the system call     
+
+    li a0, 10                 # Load the system call number for exit
+    ecall                     # Exit the program  

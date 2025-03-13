@@ -6,9 +6,9 @@ index: .word 0                # Store index in data memory and initialize to 0
 
 .text                         # Start of instruction memeory 
 main: 
-    la t0 max                 # Load address of max into t0  
-    la t1 array               # Load address of array into t1
-    la t2 index               # Load address of index into t2
+    la t0, max                 # Load address of max into t0  
+    la t1, array               # Load address of array into t1
+    la t2, index               # Load address of index into t2
 
     lw t3, 0(t0)              # Load max into t3
     lw t5, 0(t2)              # Load index into t5
@@ -16,7 +16,7 @@ main:
     li s1, 4                  # Load compare 4 into s1
 
 loop:
-    bge t5, s1, end           # Branch to skip if index >= 4
+    bge t5, s1, end           # Branch to end if index >= 4
 
     lw t4, 0(t1)              # Load array[i] value into t4
     blt t3, t4, new_max       # Branch to new_max if max < array[index]
@@ -28,10 +28,16 @@ skip:
 
 new_max:
     sw t4, 0(t0)              # Store new max
+    lw t3, 0(t0)              # Reload max into t3
+
+    addi t1, t1, 4            # Increment array address by 4 bytes
     addi t5, t5, 1            # Increment index by 1
-    j skip
+    j loop
 
 end: 
-    add a1, t0, zero          # Copy the address of max into t0
+    lw a1, 0(t0)              # Load the value of max into a1 (not the address)
     li a0, 1                  # Load the system call number for print_int
     ecall                     # Make the system call
+    
+    li a0, 10                 # Load the system call number for exit
+    ecall                     # Exit the program
