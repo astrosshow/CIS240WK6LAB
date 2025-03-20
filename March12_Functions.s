@@ -1,22 +1,37 @@
-.data                       # Data memory 
-num1: .word 5               # Store 5 (num1) in data memory 
-num2: .word 7               # Store 7 (num2) in data memory 
-result: .word 0             # initialize result with 0 
+.data                
 
-.txt                        # Instruction memory
-main: 
-    la t0, num1             # Load address of num1 to t0
-    la t1, num2             # Load address of num2 to t1
-    la t2, result           # Load address of result to t2
+.text               
+    li t0, 5            # store 5 in t0 
+    li t1, 7            # store 7 in t1 
+    li s1, 0            # intialize result variable with 0 
 
-    lw t4, 0(t0)            # Load num1 into t4
-    lw t5, 4(t1)            # Load num2 into t5
-    lw s1, 0(t2)            # Load result into s1
+    addi sp, sp, -16    # Make space in stack 
 
-func_addtwoNums: 
-    addi t4, t5, zero       # Function that adds two numbers
+    sw t0, 0(sp)        # Reserve 5 in stack
+    sw t1, 4(sp)        # Reserve 7 in stack
+
+    j addTwoNumbers     # call addTwoNumbers function 
     
-func_addOne:
-    addi result, zero, 1    # Function that adds one 
+return_main:
+    mv s1, s0           # move value of finalResult to result
 
-    
+    j done              # jump to done to print result
+
+addTwoNumbers: 
+    lw t0, 0(sp)        # Restore t0 value 
+    lw t1, 4(sp)        # Restore t1 value 
+
+    addi sp, sp, 16     # Free 2 words in stack
+
+    addi t2, t0, t1     # function sum(t2) = x + y
+
+    j addOne            # call addOne func 
+
+addOne: 
+    addi s0, t2, 1      # increment sum(t2), finalResult(s0)
+
+    j return_main       # return to main
+
+done: 
+    li a7, 10 
+    ecall 
