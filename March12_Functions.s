@@ -1,52 +1,41 @@
-.data                
+.data
+.text
+main: 
+    addi sp, sp, -16    # Allocate 16 bytes on the stack (aligned to 16 bytes)
+    sw ra, 12(sp)       # Store return address on the stack
 
-.text               
-    li t0, 5                  # store 5 in t0 
-    li t1, 7                  # store 7 in t1 
-    li s1, 0                  # initialize result var
+    li t0, 5            # Load 5 into t0
+    li t1, 7            # Load 7 into t1
 
-    addi sp, sp, -16          # allocate space in stack 
-
-    sw t0, 0(sp)              # Reserve 5 in stack
-    sw t1, 4(sp)              # Reserve 7 in stack
-
-    jal addTwoNumbers     # call addTwoNumbers function and save ra in stack (ra = PC + 4)
+    jal addTwoNumbers   # Call addTwoNumbers function
     
-return_main:
-    lw s0, 12(sp)             # load value of result from stack 
-    mv s1, s0                 # copy value of s0 to s1
+    li a7, 1            # System call for print integer
+    ecall               # Print the result in a0
 
-    addi sp, sp, 16           # deallocate space in stack 
-    
-    mv a0, s1                 # copy result into a0
-    li a7, 1                  # syscall for print int 
-    ecall
-
-    j done                    # jump to done to print result
+    li a7, 10           # System call for exit
+    ecall               # Exit the program
 
 addTwoNumbers: 
-    lw t0, 0(sp)              # Restore t0 value from stack 
-    lw t1, 4(sp)              # Restore t1 value from stack 
+    addi sp, sp, -16    # Allocate 16 bytes on the stack (aligned to 16 bytes)
+    sw ra, 12(sp)       # Store return address on the stack
 
-    mv a0, t0                 # copy t0 value to argument (a0)
-    mv a1, t1                 # copy t1 value to argument (a1)
+    mv a0, t0           # Copy 5 to a0 (first argument)
+    mv a1, t1           # Copy 7 to a1 (second argument)
 
-    add t2, a0, a1           # function sum(t2) = x + y
-    sw t2, 8(sp)              # store return value in stack
+    add a0, a0, a1      # Add a0 and a1, store result in a0
 
-    jal addOne            # call addOne function and save ra in stack (ra = PC + 4)
-    jr ra                     # return to caller 
+    jal addOne          # Call addOne function
+
+    lw ra, 12(sp)       # Restore return address
+    addi sp, sp, 16     # Deallocate stack space
+    ret                 # Return to main
 
 addOne: 
-    lw t2, 8(sp)              # Restore t2 value from stack 
+    addi sp, sp, -16    # Allocate 16 bytes on the stack (aligned to 16 bytes)
+    sw ra, 12(sp)       # Store return address on the stack
 
-    mv a4, t2                 # copy t2 value to agrument (a4)
+    addi a0, a0, 1      # Add 1 to a0
 
-    addi s0, a4, 1            # increment sum(t2), finalResult(s0)
-    sw s0, 12(sp)             # store return value in stack
-
-    jr ra                     # return to caller
-
-done: 
-    li a7, 10                 # ecall to exit
-    ecall 
+    lw ra, 12(sp)       # Restore return address
+    addi sp, sp, 16     # Deallocate stack space
+    ret                 # Return to addTwoNumbers
